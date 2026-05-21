@@ -38,7 +38,7 @@ TEST_CASE("test_load_config_valid_json_path_loads_feet_ratio", "[data][config]")
     data::loadConfig("tests/fixtures/valid_config.json", reg);
 
     // Then
-    REQUIRE(reg.getRatioToMeter("feet") == Approx(3.28084).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("feet") == Approx(0.30480).epsilon(kEps));
 }
 
 // TC-D-02  보호: 유효 JSON → yard 비율 정상 로드
@@ -48,7 +48,7 @@ TEST_CASE("test_load_config_valid_json_path_loads_yard_ratio", "[data][config]")
 
     data::loadConfig("tests/fixtures/valid_config.json", reg);
 
-    REQUIRE(reg.getRatioToMeter("yard") == Approx(1.09361).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("yard") == Approx(0.91440).epsilon(kEps));
 }
 
 // TC-D-03  보호: 사용자 정의 단위 "cubit" JSON → 등록 후 변환 가능
@@ -73,7 +73,7 @@ TEST_CASE("test_load_config_nonexistent_path_uses_default_feet_ratio", "[data][c
 
     // 예외 없이 조용히 폴백
     REQUIRE_NOTHROW(data::loadConfig("tests/fixtures/nonexistent.json", reg));
-    REQUIRE(reg.getRatioToMeter("feet") == Approx(3.28084).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("feet") == Approx(0.30480).epsilon(kEps));
 }
 
 // TC-D-05  보호: 파일 없음 → 기본값 폴백 (yard)
@@ -82,7 +82,7 @@ TEST_CASE("test_load_config_nonexistent_path_uses_default_yard_ratio", "[data][c
     reg.seedDefaults();
 
     REQUIRE_NOTHROW(data::loadConfig("tests/fixtures/nonexistent.json", reg));
-    REQUIRE(reg.getRatioToMeter("yard") == Approx(1.09361).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("yard") == Approx(0.91440).epsilon(kEps));
 }
 
 // ============================================================
@@ -103,8 +103,8 @@ TEST_CASE("test_load_config_malformed_json_throws_or_uses_defaults", "[data][con
 
     if (!threw) {
         // 폴백 선택 시 기본값 유효 상태 유지
-        REQUIRE(reg.getRatioToMeter("feet") == Approx(3.28084).epsilon(kEps));
-        REQUIRE(reg.getRatioToMeter("yard") == Approx(1.09361).epsilon(kEps));
+        REQUIRE(reg.getRatioToMeter("feet") == Approx(0.30480).epsilon(kEps));
+        REQUIRE(reg.getRatioToMeter("yard") == Approx(0.91440).epsilon(kEps));
     }
     // 예외 선택 시 테스트 통과 (어느 정책이든 허용)
     SUCCEED();
@@ -116,8 +116,8 @@ TEST_CASE("test_load_config_empty_file_uses_default_ratios", "[data][config]") {
     reg.seedDefaults();
 
     REQUIRE_NOTHROW(data::loadConfig("tests/fixtures/empty_config.json", reg));
-    REQUIRE(reg.getRatioToMeter("feet") == Approx(3.28084).epsilon(kEps));
-    REQUIRE(reg.getRatioToMeter("yard") == Approx(1.09361).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("feet") == Approx(0.30480).epsilon(kEps));
+    REQUIRE(reg.getRatioToMeter("yard") == Approx(0.91440).epsilon(kEps));
 }
 
 // TC-D-08  보호: 음수 비율 JSON → std::invalid_argument
