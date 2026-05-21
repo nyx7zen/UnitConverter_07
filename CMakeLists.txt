@@ -21,7 +21,12 @@ if(ENABLE_TESTING)
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
         GIT_TAG        v3.4.0
     )
-    FetchContent_MakeAvailable(Catch2)
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG        v3.11.3
+    )
+    FetchContent_MakeAvailable(Catch2 nlohmann_json)
 
     enable_testing()
     include(CTest)
@@ -30,11 +35,16 @@ if(ENABLE_TESTING)
         tests/test_domain.cpp
         tests/test_boundary.cpp
         tests/test_data.cpp
+        entity/UnitRegistry.cpp
+        entity/LengthConverter.cpp
+        boundary/ConversionService.cpp
+        boundary/InputParser.cpp
+        data/JsonUnitDefinitionReader.cpp
     )
 
     target_compile_features(UnitConverter_test PRIVATE cxx_std_17)
     target_include_directories(UnitConverter_test PRIVATE ${CMAKE_SOURCE_DIR})
-    target_link_libraries(UnitConverter_test PRIVATE Catch2::Catch2WithMain)
+    target_link_libraries(UnitConverter_test PRIVATE Catch2::Catch2WithMain nlohmann_json::nlohmann_json)
 
     # catch_discover_tests: CTest에 개별 TC 자동 등록
     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
@@ -45,6 +55,7 @@ if(ENABLE_TESTING)
     catch_discover_tests(UnitConverter_test
         DISCOVERY_MODE PRE_TEST
         DL_PATHS "C:/mingw64/bin"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
 endif()
