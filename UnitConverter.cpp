@@ -7,8 +7,6 @@
 int main() {
     entity::UnitRegistry reg;
     reg.seedDefaults();
-    data::loadConfig("config/units.json", reg);
-
     entity::LengthConverter conv(reg);
     boundary::ConversionService svc(conv);
 
@@ -17,6 +15,7 @@ int main() {
     std::getline(std::cin, input);
 
     try {
+        data::loadConfig("config/units.json", reg);
         std::cout << svc.parseAndConvert(input) << '\n';
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << '\n';
