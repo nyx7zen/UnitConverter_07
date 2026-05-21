@@ -5,10 +5,16 @@
 namespace boundary {
 
 ParseResult parse(const std::string& input) {
-    if (input.find(':') == std::string::npos) {
+    auto colonPos = input.find(':');
+    if (colonPos == std::string::npos) {
         throw std::invalid_argument("invalid format: missing ':'");
     }
-    return {"", 0.0};
+    std::string valueStr = input.substr(colonPos + 1);
+    double value = std::stod(valueStr);
+    if (value < 0.0) {
+        throw std::invalid_argument("negative value not allowed");
+    }
+    return {"", value};
 }
 
 } // namespace boundary
