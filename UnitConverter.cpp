@@ -5,12 +5,14 @@
 #include "data/JsonUnitDefinitionReader.h"
 #include <iostream>
 
+static constexpr const char* kDefaultConfigPath = "config/units.json";
+
 int main() {
     entity::UnitRegistry reg;
     reg.seedDefaults();
 
     try {
-        data::loadConfig("config/units.json", reg);
+        data::loadConfig(kDefaultConfigPath, reg);
     } catch (const std::exception& e) {
         std::cerr << "Config error: " << e.what() << '\n';
         return 1;
