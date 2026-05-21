@@ -1,11 +1,13 @@
 #include "ConversionService.h"
+#include "InputParser.h"
 
 namespace boundary {
 
 ConversionService::ConversionService(entity::ILengthConverter& converter)
     : converter_(converter) {}
 
-std::string ConversionService::parseAndConvert(const std::string& /*input*/) const {
+std::string ConversionService::parseAndConvert(const std::string& input) const {
+    parse(input);
     return "";
 }
 
