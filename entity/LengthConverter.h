@@ -1,4 +1,5 @@
 #pragma once
+#include "ILengthConverter.h"
 #include "UnitRegistry.h"
 #include <map>
 #include <string>
@@ -7,7 +8,7 @@ namespace entity {
 
 // Domain converter. Uses UnitRegistry for meter-hub conversion.
 // Boundary layer injects via ILengthConverter interface.
-class LengthConverter {
+class LengthConverter : public ILengthConverter {
 public:
     explicit LengthConverter(const UnitRegistry& registry);
 

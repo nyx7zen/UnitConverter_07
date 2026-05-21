@@ -4,8 +4,28 @@ project(UnitConverter_07 CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# ── 공통 의존성 ────────────────────────────────────────────
+set(BUILD_SHARED_LIBS OFF)
+
+include(FetchContent)
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 # ── 프로덕션 실행 파일 ──────────────────────────────────────
-add_executable(UnitConverter UnitConverter.cpp)
+add_executable(UnitConverter
+    UnitConverter.cpp
+    entity/UnitRegistry.cpp
+    entity/LengthConverter.cpp
+    boundary/ConversionService.cpp
+    boundary/InputParser.cpp
+    data/JsonUnitDefinitionReader.cpp
+)
+target_include_directories(UnitConverter PRIVATE ${CMAKE_SOURCE_DIR})
+target_link_libraries(UnitConverter PRIVATE nlohmann_json::nlohmann_json)
 
 # ── 테스트 옵션 ────────────────────────────────────────────
 option(ENABLE_TESTING  "Enable Catch2 unit tests"   ON)
@@ -13,20 +33,12 @@ option(ENABLE_COVERAGE "Enable gcov/lcov coverage"  OFF)
 
 if(ENABLE_TESTING)
 
-    set(BUILD_SHARED_LIBS OFF)   # Catch2를 정적 라이브러리로 빌드 (DLL 의존성 제거)
-
-    include(FetchContent)
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
         GIT_TAG        v3.4.0
     )
-    FetchContent_Declare(
-        nlohmann_json
-        GIT_REPOSITORY https://github.com/nlohmann/json.git
-        GIT_TAG        v3.11.3
-    )
-    FetchContent_MakeAvailable(Catch2 nlohmann_json)
+    FetchContent_MakeAvailable(Catch2)
 
     enable_testing()
     include(CTest)
