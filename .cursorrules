@@ -1,0 +1,213 @@
+################################################################################
+project:
+  name: UnitConverter
+  language: C++
+  standard: C++17
+  description: >
+    길이 단위 변환 CLI. meter 허브 기준 환산, 동적 단위 등록,
+    설정 외부화, table/json/csv 출력.
+  build: g++
+  test_framework: Catch2
+
+################################################################################
+code_style:
+  formatter: clang-format
+  standard: C++17
+  naming:
+    types: PascalCase
+    functions: camelCase
+    variables: camelCase
+    constants: kPascalCase or constexpr inline
+    files: PascalCase matching primary type
+    namespaces: lower_snake or project prefix
+  header_source_split:
+    - 선언은 include/ 또는 모듈 루트 .h, 정의는 src/ .cpp
+    - 헤더는 include guard 또는 #pragma once
+    - 템플릿·constexpr 소량 예외 외 구현은 .cpp에 둔다
+  includes:
+    - 자기 헤더 → 표준 → 서드파티 → 프로젝트 순
+    - 헤더에서 using namespace std 금지
+  formatting:
+    - 커밋 전 clang-format 적용
+    - 줄 길이 100 권장, 들여쓰기 4 spaces
+
+################################################################################
+architecture:
+  layers:
+    entity:
+      role: Domain. UnitRegistry, LengthConverter, UnitRatio, 불변식.
+      depends_on: []
+    control:
+      role: Use case. ConvertController, RegisterController, StartupLoader.
+      depends_on: [entity, data_adapters via interface]
+    boundary:
+      role: CLI 입출력, 파싱, 렌더(table/json/csv), 에러 표면화.
+      depends_on: [control]
+    data:
+      role: 설정·단위 정의 로드(JSON). DTO만 entity에 주입.
+      depends_on: []
+  dependency_direction:
+    - boundary → control → entity
+    - control → data (interface)
+    - entity → boundary | control | data 금지
+    - data → entity 구현 의존 금지(DTO 변환은 control)
+  hub_unit: meter
+  extension:
+    - 새 단위: registry 등록만, converter 분기 추가 금지
+    - 새 출력: boundary renderer 추가, entity 무변경
+
+################################################################################
+tdd_rules:
+  red_phase:
+    description: >
+      Catch2 테스트를 먼저 작성하고 실패를 확인한 뒤,
+      Domain(변환·등록·불변식)부터 최소 범위로 구현한다.
+    rules:
+      - 실패하는 테스트(D-TC, B-TC, DT-TC, I-TC ID)를 먼저 추가한다
+      - Domain 테스트는 I/O·파일·stdout 없이 순수 로직만 검증한다
+      - 허브 변환(meter/feet/yard), 음수 거절, 미지원 단위를 RED 우선 순서로 작성한다
+      - Boundary 테스트는 Domain을 mock/stub하여 계약(에러 문구·exit code·포맷)만 검증한다
+      - 하나의 RED 테스트당 하나의 실패 원인만 드러나게 한다
+      - 비율 기대값은 README 상수(3.28084, 1.09361)와 epsilon 1e-9로 고정한다
+    must_not:
+      - 테스트 없이 프로덕션 코드를 먼저 작성하지 않는다
+      - RED 단계에서 전체 통합·파일 로드·JSON 파서를 한꺼번에 구현하지 않는다
+      - golden 출력·에러 메시지를 임의 문구로 작성하지 않는다(설계 계약과 불일치)
+      - Domain에 cout, fstream, argv 파싱을 넣지 않는다
+      - 실패 테스트를 @skip, DISABLED, 주석 처리로 숨기지 않는다
+
+  green_phase:
+    description: >
+      현재 RED 테스트를 통과시키는 최소 코드만 작성하고,
+      테스트 스위트 전체가 GREEN인지 확인한다.
+    rules:
+      - RED를 통과하는 가장 단순한 구현(하드코딩 포함)을 허용한다
+      - Domain 먼저 GREEN → Boundary mock GREEN → Data → Integration 순으로 진행한다
+      - DomainError와 Boundary exit/message 매핑을 설계 표와 동일하게 유지한다
+      - 표·JSON·CSV는 동일 반올림(half-up, 소수 1자리) 규칙을 공유한다
+      - 동적 등록 후 즉시 convert 스냅샷에 신규 단위가 포함되는지 테스트로 확인한다
+      - 커밋 전 해당 레이어 태그 필터 테스트 전부 실행한다
+    must_not:
+      - GREEN을 위해 테스트 기대값·epsilon·메시지 문자열을 변경하지 않는다
+      - 통과하지 않은 테스트를 삭제·완화하지 않는다
+      - 여러 RED를 한 번에 풀기 위해 범위 밖 리팩토링·기능 추가를 하지 않는다
+      - feet↔yard 직접 상수로 우회 구현하지 않는다(meter 허브만)
+      - Boundary 없이 Domain에서 stdout으로 결과를 출력하지 않는다
+
+  refactor_phase:
+    description: >
+      전체 테스트가 GREEN인 상태에서만 구조를 개선하고,
+      OCP/SRP·BCE 경계를 강화하며 동작·계약은 불변으로 유지한다.
+    rules:
+      - 리팩토링 전후 동일 테스트 스위트를 실행하고 diff 없음을 확인한다
+      - 중복 비율·분기를 UnitRegistry/LengthConverter로 추출한다
+      - 새 단위·포맷 추가 시 기존 Domain 테스트 수정 없이 확장 가능한지 확인한다
+      - Boundary·Data·Control·Domain 의존 방향을 유지한다(Domain은 외부 레이어 미참조)
+      - golden 출력·에러 메시지 변경 시 설계 문서와 B-TC/I-TC를 동시 갱신한다
+      - 테스트 이름·태그([domain][boundary][integration])를 유지한다
+    must_not:
+      - RED/GREEN 없이 대규모 구조 변경을 하지 않는다
+      - 리팩토링 중 새 요구(포맷·등록·설정)를 동시에 추가하지 않는다
+      - 공개 Domain API 시그니처를 테스트 갱신 없이 변경하지 않는다
+      - 커버리지 목표(Domain 95%, Boundary 90%, Data 85%) 미달을 무시하지 않는다
+      - if-else 단위 분기를 새 단위마다 LengthConverter에 누적하지 않는다
+
+################################################################################
+testing:
+  framework: Catch2
+  pattern: AAA
+  aaa:
+    arrange: Given registry/입력/fixture 시드
+    act: When convert/register/parse 호출
+    assert: Then Result 또는 exact stderr/stdout golden
+  fixtures:
+    - entity 테스트: UnitRegistryFixture(seedDefaults)
+    - boundary 테스트: MockLengthConverter 고정 스냅샷
+    - integration: 임시 config JSON + stdin 문자열
+  tags:
+    - "[entity][ratio]", "[boundary][parse]", "[boundary][json]"
+    - "[data][config]", "[integration]"
+  coverage_targets:
+    entity: { line: 95, branch: 90 }
+    boundary: { line: 90, branch: 85 }
+    data: { line: 85, branch: 80 }
+    control: { line: 80, branch: 75 }
+  epsilon: 1.0e-9
+  golden:
+    - 에러 메시지·table/json/csv 출력은 문자열 완전 일치
+    - 반올림: half-up 소수 1자리(boundary 전용)
+
+################################################################################
+forbidden:
+  - pattern: "std::cout / std::cerr 디버그 출력 다수 삽입"
+    reason: Boundary 계약·golden 테스트 오염, stderr 혼선
+    alternative: "Catch2 CAPTURE, 로거 인터페이스(테스트에서 mock)"
+
+  - pattern: "변환 비율·epsilon을 숫자 리터럴로 산 scattered (3.28084 등)"
+    reason: 단일 진실 원천 위반, 테스트·설정 불일치
+    alternative: "UnitRatio 상수, config JSON, named constexpr kFeetPerMeter"
+
+  - pattern: "catch (...) { } 또는 catch(...) without rethrow"
+    reason: 실패 원인 은닉, DomainError 매핑 불가
+    alternative: "catch (const std::exception& e), expected DomainError enum"
+
+  - pattern: "비-trivial 함수 정의를 .h에 직접 작성(헤더 내 구현)"
+    reason: ODR·컴파일 의존 증가, entity/boundary 경계 흐림
+    alternative: ".h 선언 + .cpp 정의, inline은 5줄 이하 한정"
+
+  - pattern: "namespace 전역 mutable registry / singleton 상태"
+    reason: 테스트 격리 불가, 순서 의존 플레이키
+    alternative: "UnitRegistry 인스턴스를 fixture·control에 주입"
+
+  - pattern: "entity에서 #include <iostream> 또는 fstream"
+    reason: BCE entity 순수성 위반
+    alternative: "boundary adapter가 stream 소유, entity는 Result<T,E>만"
+
+  - pattern: "feet-yard 직접 곱셈 상수로 환산"
+    reason: meter 허브 불변식 D-INV-08 위반
+    alternative: "metersPerUnit 비율로 hub 경유 변환"
+
+################################################################################
+file_structure:
+  tree: |
+    UnitConverter_07/
+    ├── entity/                 # Domain: registry, converter, ratio, errors
+    │   ├── UnitRegistry.h
+    │   ├── UnitRegistry.cpp
+    │   ├── LengthConverter.h
+    │   └── LengthConverter.cpp
+    ├── control/                # Use cases: convert, register, bootstrap
+    │   ├── ConvertController.h
+    │   └── RegisterController.cpp
+    ├── boundary/               # CLI, parser, renderers, error map
+    │   ├── CliApp.cpp
+    │   ├── InputParser.cpp
+    │   └── TableRenderer.cpp
+    ├── data/                   # JSON config reader (optional phase)
+    │   └── JsonUnitDefinitionReader.cpp
+    ├── tests/
+    │   ├── entity/             # [entity] Catch2
+    │   ├── boundary/           # [boundary] mock entity
+    │   ├── data/
+    │   └── integration/        # end-to-end
+    ├── config/
+    │   └── units.json
+    └── main.cpp                # wiring only, logic 금지
+
+################################################################################
+ai_behavior:
+  layer_discipline:
+    - entity에 I/O·파싱·포맷·파일 로드 금지
+    - boundary가 entity/data를 직접 mutate 금지(control 경유)
+    - main.cpp는 조립만
+  workflow:
+    - 항상 실패 테스트(RED) 먼저 제안·작성
+    - GREEN은 현재 실패 테스트 통과에 필요한 최소 diff만
+    - refactor는 전 테스트 GREEN 확인 후에만
+  output:
+    - 한 턴에 RED 1~3개 또는 GREEN 1개 범위 우선
+    - 설계 계약과 다른 에러 문구·출력 생성 금지
+  must_not:
+    - 레이어 위반 코드를 편의상 한 파일에 몰아넣기
+    - 테스트 삭제·완화로 GREEN 만들기
+    - tdd_rules.green_phase 하드코딩 허용을 refactor 전 영구화
