@@ -47,6 +47,7 @@ if(ENABLE_TESTING)
         tests/test_domain.cpp
         tests/test_boundary.cpp
         tests/test_data.cpp
+        tests/test_golden_master.cpp
         entity/UnitRegistry.cpp
         entity/LengthConverter.cpp
         boundary/ConversionService.cpp
