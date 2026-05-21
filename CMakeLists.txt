@@ -30,6 +30,11 @@ if(ENABLE_TESTING)
         tests/test_domain.cpp
         tests/test_boundary.cpp
         tests/test_data.cpp
+        entity/UnitRegistry.cpp
+        entity/LengthConverter.cpp
+        boundary/ConversionService.cpp
+        boundary/InputParser.cpp
+        data/JsonUnitDefinitionReader.cpp
     )
 
     target_compile_features(UnitConverter_test PRIVATE cxx_std_17)
