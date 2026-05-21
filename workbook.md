@@ -483,7 +483,7 @@ bullet만.
 | **목적** | Track A(Boundary) + Track B(Logic) 실패 테스트 동시 설계 |
 |---|---|
 | **산출물** | Catch2 테스트 파일 스켈레톤 (FAIL("RED") 한 줄) |
-| **브랜치** | `red` (A_01에서 분기) |
+| **브랜치** | `red` (B_01에서 분기) |
 
 > ⚠ 구현 코드 작성 금지 / GREEN·REFACTOR 단계 진입 금지
 > ⚠ 모든 테스트는 현재 실패 상태여야 함 / Domain은 Mock으로 가정
@@ -503,7 +503,7 @@ bullet만.
 ```
 깃 브랜치 전략 — C++
 
-@@UnitConverter_07 프로젝트를 구현하기 위한 깃 브랜치 전략을 알려줘.
+@UnitConverter_07 프로젝트를 구현하기 위한 깃 브랜치 전략을 알려줘.
 개발방법론은 Dual-Track TDD 이고, 다음의 순서로 진행할 거야.
 - Dual-Track UI + Logic TDD (RED 단계)
 - GREEN 단계 (테스트 통과)
@@ -514,13 +514,13 @@ bullet만.
 
 ```
 main
-└── A_01                     ← 통합 브랜치 (main에서 생성)
-      ├── spec                 → PR → A_01 머지 후 삭제
-      ├── red                  → PR → A_01 머지 후 삭제
-      ├── green                → PR → A_01 머지 후 삭제
-      ├── refactoring          → PR → A_01 머지 후 삭제
-      └── feature/new_feature  → PR → A_01 머지 후 삭제
-최종: A_01 → main  (모든 단계 완료 후 릴리스 PR)
+└── B_01                     ← 통합 브랜치 (main에서 생성)
+      ├── spec                 → PR → B_01 머지 후 삭제
+      ├── red                  → PR → B_01 머지 후 삭제
+      ├── green                → PR → B_01 머지 후 삭제
+      ├── refactoring          → PR → B_01 머지 후 삭제
+      └── feature/new_feature  → PR → B_01 머지 후 삭제
+최종: B_01 → main  (모든 단계 완료 후 릴리스 PR)
 ```
 
 ---
@@ -534,7 +534,7 @@ main
 ```
 샘플 예제 선택 — C++
 
-@@UnitConverter_07/README.md 와 PRD 문서를 참고하여
+@UnitConverter_07/README.md 와 PRD 문서를 참고하여
 테스트 플랜 작성을 위한 샘플 예제 1개를 선택해줘.
 
 선택 기준:
@@ -572,7 +572,7 @@ main
     - 예외/특이 케이스 목록
     - 커버리지 목표 (Domain 95%+ / Boundary 85%+)
     - gcov / lcov 측정 전략
-[F] Markdown 문서. test_plan.md로 저장.
+[F] Markdown 문서. docs/test_plan.md로 저장.
 ```
 
 #### Step 3 — README에 RED 단계 To-Do 리스트 추가
@@ -580,7 +580,7 @@ main
 ```
 README — RED 단계 To-Do 리스트 추가 — C++
 
-@@UnitConverter_07/README.md 파일에 아래 섹션을 추가해줘.
+@UnitConverter_07/README.md 파일에 아래 섹션을 추가해줘.
 기존 내용은 유지하고, "## RED 단계 To-Do 리스트" 섹션만 새로 삽입.
 
 ## RED 단계 To-Do 리스트
@@ -705,7 +705,7 @@ GREEN 단계에서 `FAIL("RED")`를 실제 구현으로 채우는 방식
     예시:
     │ DEF-001 │ Critical │ meter→feet │ "meter:2.5" 입력 │ 8.202100 │ 0.000000 │
     │ if-else 체인에서 feet 분기 누락 │ meterValue * 3.28084 추가 │
-[F] Markdown. defect_list.md로 저장.
+[F] Markdown. docs/defect_list.md로 저장.
     README의 "RED 단계 To-Do 리스트 > 결함 목록 연결" 체크박스도 업데이트.
 ```
 
@@ -783,7 +783,7 @@ ctest --test-dir build -V
 
 | **목적** | 선택한 RED 테스트 1묶음만 통과 / 기타 범위 확장 금지 |
 |---|---|
-| **브랜치** | `green` (A_01에서 분기) |
+| **브랜치** | `green` (B_01에서 분기) |
 | **커밋 단위** | RED 1묶음 선택 → 최소 구현 → 테스트 통과 → 커밋 |
 
 > ⚠ 테스트 약화·삭제 금지 / REFACTOR 이번 커밋에서 금지 / 매직 넘버 3.28084/1.09361 상수화 필수
@@ -802,9 +802,9 @@ ctest --test-dir build -V
 ### 과제 GREEN-A — 브랜치 준비 (C++)
 
 ```bash
-# RED → A_01 PR 머지 완료 후
-git checkout A_01
-git pull origin A_01
+# RED → B_01 PR 머지 완료 후
+git checkout B_01
+git pull origin B_01
 git checkout -b green
 git push --set-upstream origin green
 # 현재 브랜치 확인
@@ -897,7 +897,7 @@ gcov UnitConverter.cpp
 - 비율 상수 3.28084 / 1.09361이 인라인으로 남아 있지 않음
 - main() 함수에 변환 로직이 남아 있지 않음 (Domain으로 분리됨)
 
-이후: green → A_01 PR 생성 → 리뷰 → 머지
+이후: green → B_01 PR 생성 → 리뷰 → 머지
 ```
 
 ### GREEN 프롬프트 例1 — 간결 버전 (C++)
@@ -964,7 +964,7 @@ Step 3) 테스트 실행 및 통과 확인
 | **목적** | UnitConverter 출력 기반 Golden Master 회귀 테스트 구축 및 CI 연동 |
 |---|---|
 | **산출물** | test_golden_master.cpp + golden_master_expected.txt |
-| **브랜치** | `refactoring` (A_01에서 분기) |
+| **브랜치** | `refactoring` (B_01에서 분기) |
 | **타이밍** | GREEN 단계 완료 후, Refactoring(P-07/P-08) 시작 직전 구축 |
 
 > **💡 Golden Master란?** 현재 시스템의 실제 출력(stdout)을 "기준 파일"로 저장해두고, 코드 변경(Refactoring) 후에도 출력이 동일한지 자동으로 비교하는 회귀 테스트 기법.
@@ -1048,7 +1048,7 @@ GM-2 테스트 코드 — C++
     실패 시 출력:
     --- expected
     +++ actual
-    @@ 라인별 diff 표시 @@
+    @ 라인별 diff 표시 @
 [F] test_golden_master.cpp + golden_master_expected.txt 완성 코드
 ```
 
@@ -1078,7 +1078,7 @@ TEST_F(GoldenMasterTest, meter_2_5_matches_golden_master) {
 ```
 GM-4 README 업데이트 — C++
 
-@@UnitConverter_07/README.md 파일에 아래 섹션을 추가해줘.
+@UnitConverter_07/README.md 파일에 아래 섹션을 추가해줘.
 "## RED 단계 To-Do 리스트" 아래에 새 섹션으로 삽입.
 
 ## Golden Master 회귀 안전장치
@@ -1106,15 +1106,15 @@ GM-4 README 업데이트 — C++
 
 | **목적** | 외부 계약 불변 / GREEN 유지 / 구조만 개선 |
 |---|---|
-| **브랜치** | `refactoring` (A_01에서 분기) |
+| **브랜치** | `refactoring` (B_01에서 분기) |
 | **커밋 단위** | 리팩토링 목표 1~2개 선택 → 수행 → 회귀 확인 → 커밋 |
 
 ### 과제 REF-A — 브랜치 준비 (C++)
 
 ```bash
-# GREEN → A_01 PR 머지 완료 후
-git checkout A_01
-git pull origin A_01
+# GREEN → B_01 PR 머지 완료 후
+git checkout B_01
+git pull origin B_01
 git checkout -b refactoring
 git push --set-upstream origin refactoring
 
@@ -1267,7 +1267,7 @@ gcov UnitConverter.cpp
 - Domain(변환 로직)과 Boundary(파싱·출력)가 분리됨
 - Domain 커버리지 ≥ 95% / Boundary ≥ 85%
 
-이후: refactoring → A_01 PR 생성 → 리뷰 → 머지
+이후: refactoring → B_01 PR 생성 → 리뷰 → 머지
 ```
 
 ---
@@ -1346,8 +1346,8 @@ P-10 최종 보고서
 ### 과제 BONUS-A — 브랜치 준비 (C++)
 
 ```bash
-git checkout A_01
-git pull origin A_01
+git checkout B_01
+git pull origin B_01
 git checkout -b feature/new_feature
 git push --set-upstream origin feature/new_feature
 
@@ -1435,8 +1435,8 @@ BONUS 최종 확인 — C++
 - registerUnit("cubit", -1.0) → std::invalid_argument 발생 확인
 - Domain 커버리지 ≥ 95% / Boundary ≥ 85%
 
-이후: feature/new_feature → A_01 PR 생성 → 리뷰 → 머지
-최종: A_01 → main PR → 릴리스 태그 v1.0.0
+이후: feature/new_feature → B_01 PR 생성 → 리뷰 → 머지
+최종: B_01 → main PR → 릴리스 태그 v1.0.0
 ```
 
 ---
@@ -1447,91 +1447,91 @@ BONUS 최종 확인 — C++
 
 ## 브랜치 전략 개요
 
-본 전략은 main에서 통합 브랜치(A_01)를 생성하고, 모든 작업 브랜치를 A_01에서 분기하여 A_01로 머지하는 단계별 흐름입니다.
+본 전략은 main에서 통합 브랜치(B_01)를 생성하고, 모든 작업 브랜치를 B_01에서 분기하여 B_01로 머지하는 단계별 흐름입니다.
 
 **브랜치 트리 구조:**
 
 ```
 main
-└── A_01                     ← 통합 브랜치 (main에서 생성)
-      ├── spec                 → PR → A_01 머지 후 삭제
-      ├── red                  → PR → A_01 머지 후 삭제
-      ├── green                → PR → A_01 머지 후 삭제
-      ├── refactoring          → PR → A_01 머지 후 삭제
-      └── feature/new_feature  → PR → A_01 머지 후 삭제
-최종: A_01 → main  (모든 단계 완료 후 릴리스 PR)
+└── B_01                     ← 통합 브랜치 (main에서 생성)
+      ├── spec                 → PR → B_01 머지 후 삭제
+      ├── red                  → PR → B_01 머지 후 삭제
+      ├── green                → PR → B_01 머지 후 삭제
+      ├── refactoring          → PR → B_01 머지 후 삭제
+      └── feature/new_feature  → PR → B_01 머지 후 삭제
+최종: B_01 → main  (모든 단계 완료 후 릴리스 PR)
 ```
 
 ## 브랜치 역할 및 머지 방향
 
 | **브랜치** | **부모** | **역할** | **머지 방향** |
 |---|---|---|---|
-| main | - | 릴리스 브랜치. 검증 완료 코드만 존재. | ← A_01 (최종 릴리스 시) |
-| A_01 | main | 통합 브랜치. 모든 작업 브랜치의 기준점. | ← spec / red / green / refactoring / feature/* |
-| spec | A_01 | 명세(Spec) 작성 — PRD · Gherkin · 계약 문서 | → PR → A_01 |
-| red | A_01 | RED 단계 — 실패 테스트 스켈레톤 작성 | → PR → A_01 |
-| green | A_01 | GREEN 단계 — 최소 구현으로 테스트 통과 | → PR → A_01 |
-| refactoring | A_01 | Refactoring 단계 — 외부 계약 불변 / 구조 개선 | → PR → A_01 |
-| feature/new_feature | A_01 | 신규 기능 추가 (동적 단위 등록 등) | → PR → A_01 |
+| main | - | 릴리스 브랜치. 검증 완료 코드만 존재. | ← B_01 (최종 릴리스 시) |
+| B_01 | main | 통합 브랜치. 모든 작업 브랜치의 기준점. | ← spec / red / green / refactoring / feature/* |
+| spec | B_01 | 명세(Spec) 작성 — PRD · Gherkin · 계약 문서 | → PR → B_01 |
+| red | B_01 | RED 단계 — 실패 테스트 스켈레톤 작성 | → PR → B_01 |
+| green | B_01 | GREEN 단계 — 최소 구현으로 테스트 통과 | → PR → B_01 |
+| refactoring | B_01 | Refactoring 단계 — 외부 계약 불변 / 구조 개선 | → PR → B_01 |
+| feature/new_feature | B_01 | 신규 기능 추가 (동적 단위 등록 등) | → PR → B_01 |
 
 ## 단계별 브랜치 생성 명령어
 
-### ① A_01 브랜치 생성 (최초 1회)
+### ① B_01 브랜치 생성 (최초 1회)
 
 ```bash
 git checkout main
-git checkout -b A_01
-git push --set-upstream origin A_01
+git checkout -b B_01
+git push --set-upstream origin B_01
 ```
 
 ### ② spec 브랜치 — 명세 작성
 
 ```bash
-git checkout A_01
+git checkout B_01
 git checkout -b spec
 git push --set-upstream origin spec
 
 # 작업: PRD / Gherkin / 계약 문서 / .cursorrules 작성
-# 완료 후 A_01로 PR
+# 완료 후 B_01로 PR
 git add . && git commit -m "spec: add PRD and Gherkin scenarios"
 git push origin spec
-# GitHub: spec → A_01 방향으로 PR 생성 → 리뷰 → 머지
+# GitHub: spec → B_01 방향으로 PR 생성 → 리뷰 → 머지
 ```
 
 ### ③ red 브랜치 — 실패 테스트 작성
 
 ```bash
-git checkout A_01
-git pull origin A_01
+git checkout B_01
+git pull origin B_01
 git checkout -b red
 git push --set-upstream origin red
 
 # 작업: Dual-Track RED 테스트 스켈레톤 작성 (구현 코드 금지)
 git add . && git commit -m "test(red): add failing test skeletons for all ACs"
 git push origin red
-# GitHub: red → A_01 방향으로 PR 생성 → 리뷰 → 머지
+# GitHub: red → B_01 방향으로 PR 생성 → 리뷰 → 머지
 ```
 
 ### ④ green 브랜치 — 최소 구현
 
 ```bash
-git checkout A_01
-git pull origin A_01
+git checkout B_01
+git pull origin B_01
 git checkout -b green
 git push --set-upstream origin green
 
 # 작업: RED 테스트 1묶음씩 통과하는 최소 구현 (커밋 단위)
 # 커밋 예시:
 git commit -m "feat(green): implement convert meter to feet"
-# 완료 후 A_01로 PR
+# 완료 후 B_01로 PR
 git push origin green
 ```
 
 ### ⑤ refactoring 브랜치 — 구조 개선
 
 ```bash
-git checkout A_01
-git pull origin A_01
+git checkout B_01
+git pull origin B_01
 git checkout -b refactoring
 git push --set-upstream origin refactoring
 
@@ -1544,8 +1544,8 @@ git push origin refactoring
 ### ⑥ feature/new_feature 브랜치 — 신규 기능
 
 ```bash
-git checkout A_01
-git pull origin A_01
+git checkout B_01
+git pull origin B_01
 git checkout -b feature/new_feature
 git push --set-upstream origin feature/new_feature
 
@@ -1554,12 +1554,12 @@ git commit -m "feat: add dynamic unit registration"
 git push origin feature/new_feature
 ```
 
-### ⑦ 최종 릴리스 — A_01 → main
+### ⑦ 최종 릴리스 — B_01 → main
 
 ```bash
 git checkout main
 git pull origin main
-# GitHub: A_01 → main 방향으로 릴리스 PR 생성 → 리뷰 → 머지
+# GitHub: B_01 → main 방향으로 릴리스 PR 생성 → 리뷰 → 머지
 
 # 릴리스 태그 부여
 git tag -a v1.0.0 -m "Release v1.0.0: UnitConverter with OCP/SRP"
@@ -1570,12 +1570,12 @@ git push origin v1.0.0
 
 | **순서** | **작업 브랜치** | **→ PR 대상** | **커밋 메시지 컨벤션** |
 |---|---|---|---|
-| ① | spec → A_01 | 리뷰 후 머지 | `spec:` / `docs:` |
-| ② | red → A_01 | 리뷰 후 머지 | `test(red):` |
-| ③ | green → A_01 | 리뷰 후 머지 | `feat(green):` |
-| ④ | refactoring → A_01 | 리뷰 후 머지 | `refactor(domain):` / `refactor(boundary):` |
-| ⑤ | feature/* → A_01 | 리뷰 후 머지 | `feat:` |
-| ⑥ | A_01 → main | 최종 릴리스 | `chore: release v1.0.0` |
+| ① | spec → B_01 | 리뷰 후 머지 | `spec:` / `docs:` |
+| ② | red → B_01 | 리뷰 후 머지 | `test(red):` |
+| ③ | green → B_01 | 리뷰 후 머지 | `feat(green):` |
+| ④ | refactoring → B_01 | 리뷰 후 머지 | `refactor(domain):` / `refactor(boundary):` |
+| ⑤ | feature/* → B_01 | 리뷰 후 머지 | `feat:` |
+| ⑥ | B_01 → main | 최종 릴리스 | `chore: release v1.0.0` |
 
 ## 브랜치 전략 수립 프롬프트
 
@@ -1586,18 +1586,18 @@ git push origin v1.0.0
 개발방법론은 Dual-Track TDD 이고, 다음의 순서로 진행할 거야.
 
 브랜치 구조:
-- main 에서 A_01 을 만든다.
-- A_01 에서 spec 을 만들어 작업 후 A_01 로 머지한다.
-- A_01 에서 red 를 만들어 작업 후 A_01 로 머지한다.
-- A_01 에서 green 을 만들어 작업 후 A_01 로 머지한다.
-- A_01 에서 refactoring 을 만들어 작업 후 A_01 로 머지한다.
-- A_01 에서 feature/new_feature 를 만들어 작업 후 A_01 로 머지한다.
-- 모든 작업 완료 후 A_01 을 main 으로 머지한다.
+- main 에서 B_01 을 만든다.
+- B_01 에서 spec 을 만들어 작업 후 B_01 로 머지한다.
+- B_01 에서 red 를 만들어 작업 후 B_01 로 머지한다.
+- B_01 에서 green 을 만들어 작업 후 B_01 로 머지한다.
+- B_01 에서 refactoring 을 만들어 작업 후 B_01 로 머지한다.
+- B_01 에서 feature/new_feature 를 만들어 작업 후 B_01 로 머지한다.
+- 모든 작업 완료 후 B_01 을 main 으로 머지한다.
 
 각 브랜치에 대해:
 1. 생성 명령어
 2. 작업 범위 및 커밋 메시지 컨벤션
-3. PR 방향 (작업브랜치 → A_01) 확인 방법
+3. PR 방향 (작업브랜치 → B_01) 확인 방법
 4. 머지 후 브랜치 삭제 여부
 ```
 
@@ -1606,26 +1606,26 @@ git push origin v1.0.0
 > **PR 작업 순서 (매 브랜치 공통)**
 > 1. 작업 브랜치에서 커밋 완료 후 `git push origin <브랜치명>`
 > 2. GitHub에서 **Compare & pull request** 클릭
-> 3. PR 방향 확인: `<작업브랜치> → A_01`  (반드시 A_01이 base여야 함)
+> 3. PR 방향 확인: `<작업브랜치> → B_01`  (반드시 B_01이 base여야 함)
 > 4. 리뷰어 추가 (Settings > Collaborators > Add people)
 > 5. 코드 리뷰 완료 후 **Merge pull request**
 > 6. 머지 완료 후 작업 브랜치 삭제 (Delete branch 버튼)
 >
-> ⚠️ PR 방향이 항상 "작업브랜치 → A_01" 인지 확인하십시오.
-> ⚠️ main 으로 직접 PR 하지 마십시오. 반드시 A_01 경유.
+> ⚠️ PR 방향이 항상 "작업브랜치 → B_01" 인지 확인하십시오.
+> ⚠️ main 으로 직접 PR 하지 마십시오. 반드시 B_01 경유.
 > ⚠️ 리뷰 없는 머지는 금지입니다.
 
 ## 전체 브랜치 흐름 요약
 
 | **단계** | **브랜치** | **주요 작업** | **완료 기준** |
 |---|---|---|---|
-| 0. 통합 브랜치 생성 | main → A_01 | A_01 생성 및 원격 Push | A_01 브랜치 원격 확인 |
-| 1. 명세 작성 | A_01 → spec → A_01 | PRD / Gherkin / .cursorrules 작성 | PR 리뷰 통과 후 A_01 머지 |
-| 2. RED 단계 | A_01 → red → A_01 | 실패 테스트 스켈레톤 작성 | 모든 테스트 FAIL 확인 후 머지 |
-| 3. GREEN 단계 | A_01 → green → A_01 | 최소 구현으로 테스트 통과 | 모든 RED 테스트 PASS 후 머지 |
-| 4. Refactoring | A_01 → refactoring → A_01 | 외부 계약 불변 / 구조 개선 | 회귀 테스트 PASS 후 머지 |
-| 5. 신규 기능 | A_01 → feature/* → A_01 | 추가 기능 구현 | 기능 테스트 PASS 후 머지 |
-| 6. 릴리스 | A_01 → main | 최종 릴리스 PR | 릴리스 태그 부여 |
+| 0. 통합 브랜치 생성 | main → B_01 | B_01 생성 및 원격 Push | B_01 브랜치 원격 확인 |
+| 1. 명세 작성 | B_01 → spec → B_01 | PRD / Gherkin / .cursorrules 작성 | PR 리뷰 통과 후 B_01 머지 |
+| 2. RED 단계 | B_01 → red → B_01 | 실패 테스트 스켈레톤 작성 | 모든 테스트 FAIL 확인 후 머지 |
+| 3. GREEN 단계 | B_01 → green → B_01 | 최소 구현으로 테스트 통과 | 모든 RED 테스트 PASS 후 머지 |
+| 4. Refactoring | B_01 → refactoring → B_01 | 외부 계약 불변 / 구조 개선 | 회귀 테스트 PASS 후 머지 |
+| 5. 신규 기능 | B_01 → feature/* → B_01 | 추가 기능 구현 | 기능 테스트 PASS 후 머지 |
+| 6. 릴리스 | B_01 → main | 최종 릴리스 PR | 릴리스 태그 부여 |
 
 ---
 
@@ -1643,4 +1643,4 @@ git push origin v1.0.0
 | PART 3 | P-05/06 GREEN (브랜치: green) | 최소 구현 / 테스트 통과 | REFACTOR / 하드코딩 |
 | PART 4 | P-07/08 Refactoring (브랜치: refactoring) | 구조 개선 / 회귀 테스트 통과 | 계약 변경 / 기능 추가 |
 | PART 5 | P-09/10 QA | 커버리지 보고서 / 최종 보고서 | 커버리지 기준 미달 |
-| PART 6 | Git 전략 (main→A_01→*→A_01→main) | 브랜치 구조 / PR 흐름 | 리뷰 없는 머지 / main 직접 PR |
+| PART 6 | Git 전략 (main→B_01→*→B_01→main) | 브랜치 구조 / PR 흐름 | 리뷰 없는 머지 / main 직접 PR |

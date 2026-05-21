@@ -1,0 +1,42 @@
+# Claude Code (local memory & settings)
+.claude/
+
+# Build
+build/
+out/
+*.exe
+*.dll
+*.a
+*.o
+*.obj
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+install_manifest.txt
+
+# Coverage
+*.gcda
+*.gcno
+*.gcov
+coverage.info
+coverage_report/
+
+# IDE
+.vscode/
+.idea/
+*.user
+*.suo
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# clangd
+.cache/
+
+# OS
+Thumbs.db
+.DS_Store
