@@ -22,6 +22,7 @@ add_executable(UnitConverter
     entity/LengthConverter.cpp
     boundary/ConversionService.cpp
     boundary/InputParser.cpp
+    boundary/CliApp.cpp
     data/JsonUnitDefinitionReader.cpp
 )
 target_include_directories(UnitConverter PRIVATE ${CMAKE_SOURCE_DIR})
@@ -47,6 +48,7 @@ if(ENABLE_TESTING)
         tests/test_domain.cpp
         tests/test_boundary.cpp
         tests/test_data.cpp
+        tests/test_golden_master.cpp
         entity/UnitRegistry.cpp
         entity/LengthConverter.cpp
         boundary/ConversionService.cpp

@@ -1,27 +1,24 @@
 #include "entity/UnitRegistry.h"
 #include "entity/LengthConverter.h"
 #include "boundary/ConversionService.h"
+#include "boundary/CliApp.h"
 #include "data/JsonUnitDefinitionReader.h"
 #include <iostream>
+
+static constexpr const char* kDefaultConfigPath = "config/units.json";
 
 int main() {
     entity::UnitRegistry reg;
     reg.seedDefaults();
-    data::loadConfig("config/units.json", reg);
-
-    entity::LengthConverter conv(reg);
-    boundary::ConversionService svc(conv);
-
-    std::cout << "Insert value for converting (ex: meter:2.5): ";
-    std::string input;
-    std::getline(std::cin, input);
 
     try {
-        std::cout << svc.parseAndConvert(input) << '\n';
+        data::loadConfig(kDefaultConfigPath, reg);
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << '\n';
+        std::cerr << "Config error: " << e.what() << '\n';
         return 1;
     }
 
-    return 0;
+    entity::LengthConverter conv(reg);
+    boundary::ConversionService svc(conv);
+    return boundary::CliApp(svc).run();
 }
