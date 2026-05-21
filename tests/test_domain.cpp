@@ -194,8 +194,8 @@ TEST_CASE("test_register_unit_cubit_then_cross_convert_to_feet_returns_1_4997", 
     reg.registerUnit("cubit", 0.4572);
     LengthConverter conv(reg);
 
-    // 1 cubit = 0.4572 m * 3.28084 ft/m ≈ 1.4997 ft
-    REQUIRE(conv.convert("cubit", 1.0, "feet") == Approx(1.4997).epsilon(1e-4));
+    // 1 cubit = 0.4572 m * 3.28084 ft/m = 1.5000 ft
+    REQUIRE(conv.convert("cubit", 1.0, "feet") == Approx(1.5000).epsilon(1e-4));
 }
 
 // TC-REG-04  보호: 음수 비율 등록 금지
