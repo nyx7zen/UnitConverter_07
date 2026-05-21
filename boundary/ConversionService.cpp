@@ -7,7 +7,8 @@ ConversionService::ConversionService(entity::ILengthConverter& converter)
     : converter_(converter) {}
 
 std::string ConversionService::parseAndConvert(const std::string& input) const {
-    parse(input);
+    auto result = parse(input);
+    converter_.convertAll(result.unit, result.value);
     return "";
 }
 

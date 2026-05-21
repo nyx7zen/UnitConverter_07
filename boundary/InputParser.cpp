@@ -9,12 +9,13 @@ ParseResult parse(const std::string& input) {
     if (colonPos == std::string::npos) {
         throw std::invalid_argument("invalid format: missing ':'");
     }
+    std::string unit = input.substr(0, colonPos);
     std::string valueStr = input.substr(colonPos + 1);
     double value = std::stod(valueStr);
     if (value < 0.0) {
         throw std::invalid_argument("negative value not allowed");
     }
-    return {"", value};
+    return {unit, value};
 }
 
 } // namespace boundary
