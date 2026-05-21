@@ -117,3 +117,98 @@ ctest --test-dir build -L data
 - `catch(...)` 0개
 - 41/41 테스트 GREEN
 - PR: refactoring → B_01 머지
+
+---
+
+# Phase 2 — BCE 완료 후 잔존 리팩토링 계획
+
+**브랜치:** feature/golden-master  
+**날짜:** 2026-05-21  
+**작성 근거:** Ask-mode 기준선·코드스멜·ECB 분석 결과 (Phase 1 BCE 완료 후)
+
+---
+
+## 워크북 후보 현황 대조
+
+| ID | 내용 | 현황 |
+|----|------|------|
+| R-U1 | InputParser 분리 | ✅ 완료 |
+| R-U2 | 예외 메시지 상수화 | ✅ 완료 |
+| R-U3 | OutputFormatter 분리 | ✅ 완료 |
+| R-L1 | ConversionRule VO 교체 | ✅ 완료 |
+| R-L2 | if-else → UnitRegistry | ✅ 완료 |
+| R-L3 | 매직 넘버 상수화 | ✅ 완료 |
+| R-L4 | convert() 추출 | ✅ 완료 |
+| **R-EX** | **예외 범위 수정** | ❌ 미완 |
+| **R-CLI** | **CliApp 추출** | ❌ 미완 |
+| **R-PATH** | **경로 하드코딩 제거** | ❌ 미완 |
+
+---
+
+## 잔존 항목 상세 (우선순위 순)
+
+```
+│ 순번 │ ID     │ 대상                    │ 문제                                  │ 적용 기법              │ 우선순위 │
+│  1   │ R-EX   │ UnitConverter.cpp:10    │ loadConfig()가 try 밖 — 예외 미처리   │ try 범위 확장          │  High   │
+│  2   │ R-CLI  │ UnitConverter.cpp:15~23 │ cout/cin/cerr가 main()에 직접 노출    │ CliApp 클래스 추출     │  High   │
+│  3   │ R-PATH │ UnitConverter.cpp:10    │ "config/units.json" 하드코딩          │ constexpr 또는 argv    │  Medium │
+```
+
+### R-EX — try 범위 확장
+
+```cpp
+// 현재 (문제): loadConfig가 try 밖
+data::loadConfig("config/units.json", reg);
+try { std::cout << svc.parseAndConvert(input) << '\n'; }
+
+// 목표: 초기화 전체를 try 안으로
+try {
+    data::loadConfig("config/units.json", reg);
+    // ... parseAndConvert ...
+} catch (const std::exception& e) { ... }
+```
+
+### R-CLI — CliApp 추출
+
+```cpp
+// 목표 main() — I/O 없음, 조립만
+int main(int argc, char* argv[]) {
+    entity::UnitRegistry reg;
+    reg.seedDefaults();
+    data::loadConfig(argc > 1 ? argv[1] : kDefaultConfigPath, reg);
+    entity::LengthConverter conv(reg);
+    boundary::ConversionService svc(conv);
+    return boundary::CliApp(svc).run();
+}
+```
+
+---
+
+## 테스트 선행 필요 항목
+
+| 항목 | 필요한 테스트 | 현황 |
+|------|-------------|------|
+| R-CLI (CliApp 추출) | CliApp::run() stdin/stdout 계약 | ❌ 추가 필요 |
+| R-EX (try 범위 확장) | loadConfig 실패 시 에러 메시지 | ⚠️ data 테스트로 부분 커버 |
+| R-PATH (경로 상수화) | 변경 없음 | ✅ Golden Master로 커버 |
+
+---
+
+## 회귀 검증 명령어
+
+```powershell
+# 전체 빌드
+cmake -S . -B build && cmake --build build
+
+# 전체 테스트
+ctest --test-dir build -V
+
+# Golden Master 단독 — 출력 불변 확인
+.\build\UnitConverter_test.exe "[golden-master]"
+
+# 레이어별
+.\build\UnitConverter_test.exe "[entity]"
+.\build\UnitConverter_test.exe "[boundary]"
+.\build\UnitConverter_test.exe "[data]"
+.\build\UnitConverter_test.exe "[integration]"
+```
